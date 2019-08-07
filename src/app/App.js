@@ -5,13 +5,16 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      title: '',
-      description: '',
+      nombre1:'',
+    nombre2:'',
+    apellido1:'',
+    apellido2:'',
+    direccion:'',
       _id: '',
-      tasks: []
+      estudiantes: []
     };
     this.handleChange = this.handleChange.bind(this);
-    this.addTask = this.addTask.bind(this);
+    this.addEstudiante = this.addEstudiante.bind(this);
   }
 
   handleChange(e) {
@@ -21,14 +24,17 @@ class App extends Component {
     });
   }
 
-  addTask(e) {
+  addEstudiante(e) {
     e.preventDefault();
     if(this.state._id) {
-      fetch(`/api/tasks/${this.state._id}`, {
+      fetch(`/api/estudiantes/${this.state._id}`, {
         method: 'PUT',
         body: JSON.stringify({
-          title: this.state.title,
-          description: this.state.description
+             nombre1:this.state.nombre1,
+             nombre2:this.state.nombre2,
+             apellido1:this.state.apellido1,
+             apellido2:this.state.apellido2,
+              direccion:this.state.direccion,
         }),
         headers: {
           'Accept': 'application/json',
@@ -37,12 +43,12 @@ class App extends Component {
       })
         .then(res => res.json())
         .then(data => {
-          window.M.toast({html: 'Task Updated'});
-          this.setState({_id: '', title: '', description: ''});
-          this.fetchTasks();
+          window.M.toast({html: 'ha sido actulizado'});
+          this.setState({_id: '', nombre1:'',nombre2:'',apellido1:'',apellido2:'',direccion:''});
+          this.fetchEstudiantes();
         });
     } else {
-      fetch('/api/tasks', {
+      fetch('/api/estudiantes', {
         method: 'POST',
         body: JSON.stringify(this.state),
         headers: {
@@ -53,18 +59,18 @@ class App extends Component {
         .then(res => res.json())
         .then(data => {
           console.log(data);
-          window.M.toast({html: 'Task Saved'});
-          this.setState({title: '', description: ''});
-          this.fetchTasks();
+          window.M.toast({html: 'guardado'});
+          this.setState({ nombre1:'',nombre2:'',apellido1:'',apellido2:'',direccion:''});
+          this.fetchEstudiantes();
         })
         .catch(err => console.error(err));
     }
 
   }
 
-  deleteTask(id) {
-    if(confirm('Are you sure you want to delete it?')) {
-      fetch(`/api/tasks/${id}`, {
+  deleteEstudiante(id) {
+    if(confirm('estas seguro de borrar')) {
+      fetch(`/api/estudiantes/${id}`, {
         method: 'DELETE',
         headers: {
           'Accept': 'application/json',
@@ -74,35 +80,38 @@ class App extends Component {
         .then(res => res.json())
         .then(data => {
           console.log(data);
-          M.toast({html: 'Task deleted'});
-          this.fetchTasks();
+          M.toast({html: 'Tborrar estudiante'});
+          this.fetchEstudiantes();
         });
     }
   }
 
-  editTask(id) {
-    fetch(`/api/tasks/${id}`)
+  editEstudiante(id) {
+    fetch(`/api/estudiantes/${id}`)
       .then(res => res.json())
       .then(data => {
         console.log(data);
         this.setState({
-          title: data.title,
-          description: data.description,
+             nombre1:data.nombre1,
+             nombre2:data.nombre2,
+             apellido1:data.apellido1,
+             pellido2:data.apellido2,
+             direccion:data.direccion,
           _id: data._id
         });
       });
   }
 
   componentDidMount() {
-    this.fetchTasks();
+    this.fetchEstudiantes();
   }
 
-  fetchTasks() {
-    fetch('/api/tasks')
+  fetchEstudiantes() {
+    fetch('/api/estudiantes')
       .then(res => res.json())
       .then(data => {
-        this.setState({tasks: data});
-        console.log(this.state.tasks);
+        this.setState({estudiantes: data});
+        console.log(this.state.estudiantes);
       });
   }
 
@@ -123,15 +132,30 @@ class App extends Component {
             <div className="col s5">
               <div className="card">
                 <div className="card-content">
-                  <form onSubmit={this.addTask}>
+                  <form onSubmit={this.addEstudiante}>
                     <div className="row">
                       <div className="input-field col s12">
-                        <input name="title" onChange={this.handleChange} value={this.state.title} type="text" placeholder="Task Title" autoFocus/>
+                        <input name="Nombre" onChange={this.handleChange} value={this.state.nombre1} type="text" placeholder="primer nombre" autoFocus/>
                       </div>
                     </div>
                     <div className="row">
                       <div className="input-field col s12">
-                        <textarea name="description" onChange={this.handleChange} value={this.state.description} cols="30" rows="10" placeholder="Task Description" className="materialize-textarea"></textarea>
+                        <input name="segundo nombre" onChange={this.handleChange} value={this.state.nombre2} type="text" placeholder="segundo nombre" autoFocus/>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="input-field col s12">
+                        <input name="Apellido" onChange={this.handleChange} value={this.state.apellido1} type="text" placeholder="primer apellido" autoFocus/>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="input-field col s12">
+                        <input name="Segundo apellido" onChange={this.handleChange} value={this.state.apellido2} type="text" placeholder="segundo apellido" autoFocus/>
+                      </div>
+                    </div>
+                    <div className="row">
+                      <div className="input-field col s12">
+                        <input name="Direccion" onChange={this.handleChange} value={this.state.direccion} type="text" placeholder="direccion" autoFocus/>
                       </div>
                     </div>
 
@@ -146,22 +170,28 @@ class App extends Component {
               <table>
                 <thead>
                   <tr>
-                    <th>Titulo</th>
-                    <th>Descripcion</th>
+                    <th>Nombre</th>
+                    <th>Segundo nombre</th>
+                    <th>Primer apellido</th>
+                    <th>Segundo apellido</th>
+                    <th>Direccion</th>
                   </tr>
                 </thead>
                 <tbody>
-                  { 
-                    this.state.tasks.map(task => {
+                  {
+                    this.state.estudiantes.map(Estudiante => {
                       return (
-                        <tr key={task._id}>
-                          <td>{task.title}</td>
-                          <td>{task.description}</td>
+                        <tr key={Estudiante._id}>
+                          <td>{Estudiante.nombre1}</td>
+                          <td>{Estudiante.nombre2}</td>
+                           <td>{Estudiante.apellido1}</td>
+                          <td>{Estudiante.apellido2}</td>
+                           <td>{Estudiante.direccion}</td>
                           <td>
-                            <button onClick={() => this.deleteTask(task._id)} className="btn light-blue darken-4">
-                              <i className="material-icons">borrar</i> 
+                            <button onClick={() => this.deleteEstudiante(Estudiante._id)} className="btn light-blue darken-4">
+                              <i className="material-icons">borrar</i>
                             </button>
-                            <button onClick={() => this.editTask(task._id)} className="btn light-blue darken-4" style={{margin: '4px'}}>
+                            <button onClick={() => this.editEstudiante(Estudiante._id)} className="btn light-blue darken-4" style={{margin: '4px'}}>
                               <i className="material-icons">editar</i>
                             </button>
                           </td>
